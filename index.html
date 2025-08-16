@@ -3,33 +3,164 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Bewerbungs-Funnel (Воронка найма)</title>
-  <!-- Tailwind via CDN (достаточно, предупреждение можно игнорировать) -->
+  <title>Gewußt wie — Bewerbungs-Funnel (Воронка найма)</title>
+
+  <!-- Tailwind CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
+
   <style>
-    html,body{background:#0b0c0f}
-    .card{background:#111318;border:1px solid #23262d}
-    .muted{color:#9aa3b2}
-    .grad{background:linear-gradient(180deg,#0b0c10,#0f1217 40%,#0b0c10)}
-    .bar {height:32px;border-radius:16px;background:#1b1f27;overflow:hidden}
-    .bar > div {height:32px;border-radius:16px;background:#3b82f6;transition:width .4s ease}
-    .input {width:100%;background:transparent;border:1px solid #2b3240;border-radius:12px;padding:.5rem .75rem;outline:none}
-    .input:focus{box-shadow:0 0 0 2px #3b82f6}
-    .btn{background:#1f2937;border:1px solid #2b3240;border-radius:12px;padding:.5rem .75rem}
-    .btn:hover{background:#263244}
+    :root{
+      --gw-green:#3d7b2b;   /* Hauptfarbe des Logos */
+      --gw-red:#c80b0e;     /* Unter-/Headline-Farbe */
+      --ink:#1b1f24;        /* основной текст */
+      --paper:#ffffff;      /* фон карточек */
+      --bg:#f6f8f5;         /* общий фон в стиле natur */
+      --border:#e2e8e0;
+    }
+    html,body{ background:var(--bg); color:var(--ink); }
+    .card{ background:var(--paper); border:1px solid var(--border); }
+    .muted{ color:#6b7280 }
+    .brand-bar{ height:14px; background:linear-gradient(90deg,var(--gw-green),#5aa340) }
+    .bar      { height:32px; border-radius:16px; background:#ecf2ea; overflow:hidden }
+    .bar > div{ height:32px; border-radius:16px; background:var(--gw-green); transition:width .35s ease }
+    .input    { width:100%; background:#fff; border:1px solid var(--border); border-radius:12px; padding:.6rem .8rem; outline:none }
+    .input:focus{ box-shadow:0 0 0 3px rgba(61,123,43,.18); border-color:var(--gw-green) }
+    .btn{ background:var(--gw-green); color:#fff; border:1px solid #2c5f22; border-radius:12px; padding:.55rem .9rem; }
+    .btn:hover{ filter:brightness(1.05) }
+    .tag{ display:inline-block; padding:.15rem .5rem; border-radius:.4rem; background:#fdeaea; color:var(--gw-red); border:1px solid #f5caca; font-size:.75rem }
+    .kpi{ font-variant-numeric: tabular-nums; }
   </style>
 </head>
-<body class="text-white grad min-h-screen">
-  <div id="app"></div>
+<body>
+  <!-- Brand header -->
+  <div class="brand-bar w-full"></div>
+  <header class="bg-white/90 sticky top-0 z-10 border-b border-[var(--border)]">
+    <div class="max-w-6xl mx-auto px-5 py-3 flex items-center gap-4">
+      <img src="logo.png" alt="Gewußt wie" class="h-9 w-auto" onerror="this.style.display='none'">
+      <div class="flex-1">
+        <h1 class="text-xl md:text-2xl font-semibold">Bewerbungs-Funnel <span class="muted">(Воронка найма)</span></h1>
+        <div class="text-sm muted">Interaktives Dashboard — Werte ändern, результаты обновляются мгновенно</div>
+      </div>
+      <button id="reset" class="btn text-sm">Reset Beispiel <span class="muted">(Сброс)</span></button>
+    </div>
+  </header>
+
+  <main class="max-w-6xl mx-auto px-5 py-7 space-y-6">
+    <section class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <!-- Controls -->
+      <div class="card rounded-2xl p-5 space-y-5">
+        <div>
+          <label class="block text-sm mb-1">Aufrufe <span class="muted">(Просмотры)</span></label>
+          <input id="in-views" type="number" min="0" class="input" value="5333">
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm mb-1">Bewerbungsrate % <span class="muted">(Конверсия в резюме)</span></label>
+            <input id="in-cv" type="number" min="0" max="100" step="0.1" class="input" value="3">
+          </div>
+          <div>
+            <label class="block text-sm mb-1">Einladungs-Rate % <span class="muted">(в собеседования)</span></label>
+            <input id="in-int" type="number" min="0" max="100" step="0.1" class="input" value="25">
+          </div>
+          <div>
+            <label class="block text-sm mb-1">Praktikum-Rate % <span class="muted">(в стажировку)</span></label>
+            <input id="in-pr" type="number" min="0" max="100" step="0.1" class="input" value="10">
+          </div>
+          <div>
+            <label class="block text-sm mb-1">Einstellungs-Rate % <span class="muted">(в принятие)</span></label>
+            <input id="in-hire" type="number" min="0" max="100" step="0.1" class="input" value="50">
+          </div>
+        </div>
+        <div>
+          <label class="block text-sm mb-1">Werbebudget (€) <span class="muted">(Бюджет объявления)</span></label>
+          <input id="in-ad" type="number" min="0" step="10" class="input" value="500">
+        </div>
+
+        <div class="text-xs">
+          <span class="tag">Hinweis</span>
+          <span class="muted ml-2">Gib Raten als Zahl ein: <b>25</b> → <b>25%</b>. (Вводи просто число.)</span>
+        </div>
+      </div>
+
+      <!-- Funnel + KPIs -->
+      <div class="lg:col-span-2 space-y-6">
+        <div class="card rounded-2xl p-5">
+          <h2 class="text-lg mb-4">Visualisierung <span class="muted">(Визуализация)</span></h2>
+
+          <!-- bars -->
+          <div id="bar-views" class="w-full mb-3">
+            <div class="flex items-center justify-between text-sm mb-1">
+              <span class="label muted"></span><span class="value font-medium kpi"></span>
+            </div>
+            <div class="bar"><div style="width:0%"></div></div>
+          </div>
+          <div id="bar-resumes" class="w-full mb-3">
+            <div class="flex items-center justify-between text-sm mb-1">
+              <span class="label muted"></span><span class="value font-medium kpi"></span>
+            </div>
+            <div class="bar"><div style="width:0%"></div></div>
+          </div>
+          <div id="bar-interviews" class="w-full mb-3">
+            <div class="flex items-center justify-between text-sm mb-1">
+              <span class="label muted"></span><span class="value font-medium kpi"></span>
+            </div>
+            <div class="bar"><div style="width:0%"></div></div>
+          </div>
+          <div id="bar-practice" class="w-full mb-3">
+            <div class="flex items-center justify-between text-sm mb-1">
+              <span class="label muted"></span><span class="value font-medium kpi"></span>
+            </div>
+            <div class="bar"><div style="width:0%"></div></div>
+          </div>
+          <div id="bar-hires" class="w-full">
+            <div class="flex items-center justify-between text-sm mb-1">
+              <span class="label muted"></span><span class="value font-medium kpi"></span>
+            </div>
+            <div class="bar"><div style="width:0%"></div></div>
+          </div>
+        </div>
+
+        <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div class="card rounded-2xl p-4">
+            <div class="text-sm muted">Lebensläufe <span class="muted">(Резюме)</span></div>
+            <div id="stat-resumes" class="text-2xl font-semibold mt-1 kpi">—</div>
+            <div class="text-xs muted mt-1">CV-Rate: <span id="hint-cv">3</span>%</div>
+          </div>
+          <div class="card rounded-2xl p-4">
+            <div class="text-sm muted">Vorstellungsgespräche <span class="muted">(Собеседования)</span></div>
+            <div id="stat-interviews" class="text-2xl font-semibold mt-1 kpi">—</div>
+            <div class="text-xs muted mt-1">Einladungs-Rate: <span id="hint-int">25</span>%</div>
+          </div>
+          <div class="card rounded-2xl p-4">
+            <div class="text-sm muted">Praktikum <span class="muted">(Стажировка)</span></div>
+            <div id="stat-practice" class="text-2xl font-semibold mt-1 kpi">—</div>
+            <div class="text-xs muted mt-1">Praktikum-Rate: <span id="hint-pr">10</span>%</div>
+          </div>
+          <div class="card rounded-2xl p-4">
+            <div class="text-sm muted">Eingestellt <span class="muted">(Приняты)</span></div>
+            <div id="stat-hires" class="text-2xl font-semibold mt-1 kpi">—</div>
+            <div class="text-xs muted mt-1">Einstellungs-Rate: <span id="hint-hire">50</span>%</div>
+          </div>
+          <div class="card rounded-2xl p-4">
+            <div class="text-sm muted">Kosten je Lebenslauf <span class="muted">(Цена за резюме)</span></div>
+            <div id="cost-cv" class="text-2xl font-semibold mt-1 kpi">—</div>
+          </div>
+          <div class="card rounded-2xl p-4">
+            <div class="text-sm muted">Kosten je Einstellung <span class="muted">(Цена за сотрудника)</span></div>
+            <div id="cost-hire" class="text-2xl font-semibold mt-1 kpi">—</div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
 
   <script>
-    const $ = (sel, ctx=document) => ctx.querySelector(sel);
-
-    // форматирование
-    const fmtNum = n => isNaN(n) ? "—" : n.toLocaleString("de-AT",{minimumFractionDigits:2,maximumFractionDigits:2});
+    // helpers
+    const $  = (sel, ctx=document) => ctx.querySelector(sel);
+    const fmtNum   = n => isNaN(n) ? "—" : n.toLocaleString("de-AT",{minimumFractionDigits:2,maximumFractionDigits:2});
     const fmtMoney = n => isNaN(n) ? "—" : n.toFixed(2) + " €";
 
-    // исходные значения
+    // state
     let views=5333, cvRate=3, intRate=25, prRate=10, hireRate=50, adSpend=500;
 
     function compute(){
@@ -43,27 +174,7 @@
       const cph = hires      ? adSpend / hires      : NaN;
 
       const maxVal = Math.max(views,resumes,interviews,practice,hires,1);
-
       return {views,resumes,interviews,practice,hires,costs:{cpr,cpi,cph},maxVal};
-    }
-
-    function render(){
-      const s = compute();
-
-      // бары
-      setBar("#bar-views",       s.views,       s.maxVal, "Aufrufe (Просмотры)");
-      setBar("#bar-resumes",     s.resumes,     s.maxVal, "Lebensläufe (Резюме)");
-      setBar("#bar-interviews",  s.interviews,  s.maxVal, "Vorstellungsgespräche (Собеседования)");
-      setBar("#bar-practice",    s.practice,    s.maxVal, "Praktikum (Стажировка)");
-      setBar("#bar-hires",       s.hires,       s.maxVal, "Eingestellt (Приняты)");
-
-      // статблоки
-      $("#stat-resumes").textContent    = fmtNum(s.resumes);
-      $("#stat-interviews").textContent = fmtNum(s.interviews);
-      $("#stat-practice").textContent   = fmtNum(s.practice);
-      $("#stat-hires").textContent      = fmtNum(s.hires);
-      $("#cost-cv").textContent         = fmtMoney(s.costs.cpr);
-      $("#cost-hire").textContent       = fmtMoney(s.costs.cph);
     }
 
     function setBar(id, value, max, label){
@@ -74,132 +185,31 @@
       wrap.querySelector(".bar > div").style.width = pct + "%";
     }
 
-    // шаблон
-    $("#app").innerHTML = `
-      <div class="mx-auto max-w-6xl p-6 md:p-10 space-y-6">
-        <div class="flex items-center justify-between flex-wrap gap-3">
-          <h1 class="text-2xl md:text-3xl font-bold">Bewerbungs-Funnel (Воронка найма)</h1>
-          <button id="reset" class="btn text-sm">Reset Beispiel (Сброс примера)</button>
-        </div>
+    function render(){
+      const s = compute();
+      setBar("#bar-views",      s.views,      s.maxVal, "Aufrufe (Просмотры)");
+      setBar("#bar-resumes",    s.resumes,    s.maxVal, "Lebensläufe (Резюме)");
+      setBar("#bar-interviews", s.interviews, s.maxVal, "Vorstellungsgespräche (Собеседования)");
+      setBar("#bar-practice",   s.practice,   s.maxVal, "Praktikum (Стажировка)");
+      setBar("#bar-hires",      s.hires,      s.maxVal, "Eingestellt (Приняты)");
 
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div class="card rounded-3xl p-5 space-y-5">
-            <div>
-              <label class="block text-sm mb-1">Aufrufe (Просмотры)</label>
-              <input id="in-views" type="number" min="0" class="input" value="${views}">
-            </div>
-            <div class="grid grid-cols-2 gap-4">
-              <div>
-                <label class="block text-sm mb-1">Bewerbungsrate % (Конверсия в резюме)</label>
-                <input id="in-cv" type="number" min="0" max="100" step="0.1" class="input" value="${cvRate}">
-              </div>
-              <div>
-                <label class="block text-sm mb-1">Einladungs-Rate % (Конверсия в собеседования)</label>
-                <input id="in-int" type="number" min="0" max="100" step="0.1" class="input" value="${intRate}">
-              </div>
-              <div>
-                <label class="block text-sm mb-1">Praktikum-Rate % (Конверсия в стажировку)</label>
-                <input id="in-pr" type="number" min="0" max="100" step="0.1" class="input" value="${prRate}">
-              </div>
-              <div>
-                <label class="block text-sm mb-1">Einstellungs-Rate % (Конверсия в принятие)</label>
-                <input id="in-hire" type="number" min="0" max="100" step="0.1" class="input" value="${hireRate}">
-              </div>
-            </div>
-            <div>
-              <label class="block text-sm mb-1">Werbebudget (€) (Бюджет объявления)</label>
-              <input id="in-ad" type="number" min="0" step="10" class="input" value="${adSpend}">
-            </div>
-          </div>
+      $("#stat-resumes").textContent    = fmtNum(s.resumes);
+      $("#stat-interviews").textContent = fmtNum(s.interviews);
+      $("#stat-practice").textContent   = fmtNum(s.practice);
+      $("#stat-hires").textContent      = fmtNum(s.hires);
+      $("#cost-cv").textContent         = fmtMoney(s.costs.cpr);
+      $("#cost-hire").textContent       = fmtMoney(s.costs.cph);
+    }
 
-          <div class="lg:col-span-2 space-y-6">
-            <div class="card rounded-3xl p-5">
-              <h2 class="text-lg mb-4">Visualisierung (Визуализация)</h2>
-
-              <div id="bar-views" class="w-full mb-3">
-                <div class="flex items-center justify-between text-sm mb-1">
-                  <span class="label muted"></span>
-                  <span class="value font-medium"></span>
-                </div>
-                <div class="bar"><div style="width:0%"></div></div>
-              </div>
-
-              <div id="bar-resumes" class="w-full mb-3">
-                <div class="flex items-center justify-between text-sm mb-1">
-                  <span class="label muted"></span>
-                  <span class="value font-medium"></span>
-                </div>
-                <div class="bar"><div style="width:0%"></div></div>
-              </div>
-
-              <div id="bar-interviews" class="w-full mb-3">
-                <div class="flex items-center justify-between text-sm mb-1">
-                  <span class="label muted"></span>
-                  <span class="value font-medium"></span>
-                </div>
-                <div class="bar"><div style="width:0%"></div></div>
-              </div>
-
-              <div id="bar-practice" class="w-full mb-3">
-                <div class="flex items-center justify-between text-sm mb-1">
-                  <span class="label muted"></span>
-                  <span class="value font-medium"></span>
-                </div>
-                <div class="bar"><div style="width:0%"></div></div>
-              </div>
-
-              <div id="bar-hires" class="w-full">
-                <div class="flex items-center justify-between text-sm mb-1">
-                  <span class="label muted"></span>
-                  <span class="value font-medium"></span>
-                </div>
-                <div class="bar"><div style="width:0%"></div></div>
-              </div>
-            </div>
-
-            <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              <div class="card rounded-2xl p-4">
-                <div class="text-sm muted">Lebensläufe (Резюме)</div>
-                <div id="stat-resumes" class="text-2xl font-semibold mt-1">—</div>
-                <div class="text-xs muted mt-1">CV-Rate: <span id="hint-cv">${cvRate}</span>%</div>
-              </div>
-              <div class="card rounded-2xl p-4">
-                <div class="text-sm muted">Vorstellungsgespräche (Собеседования)</div>
-                <div id="stat-interviews" class="text-2xl font-semibold mt-1">—</div>
-                <div class="text-xs muted mt-1">Einladungs-Rate: <span id="hint-int">${intRate}</span>%</div>
-              </div>
-              <div class="card rounded-2xl p-4">
-                <div class="text-sm muted">Praktikum (Стажировка)</div>
-                <div id="stat-practice" class="text-2xl font-semibold mt-1">—</div>
-                <div class="text-xs muted mt-1">Praktikum-Rate: <span id="hint-pr">${prRate}</span>%</div>
-              </div>
-              <div class="card rounded-2xl p-4">
-                <div class="text-sm muted">Eingestellt (Приняты)</div>
-                <div id="stat-hires" class="text-2xl font-semibold mt-1">—</div>
-                <div class="text-xs muted mt-1">Einstellungs-Rate: <span id="hint-hire">${hireRate}</span>%</div>
-              </div>
-              <div class="card rounded-2xl p-4">
-                <div class="text-sm muted">Kosten je Lebenslauf (Цена за резюме)</div>
-                <div id="cost-cv" class="text-2xl font-semibold mt-1">—</div>
-              </div>
-              <div class="card rounded-2xl p-4">
-                <div class="text-sm muted">Kosten je Einstellung (Цена за сотрудника)</div>
-                <div id="cost-hire" class="text-2xl font-semibold mt-1">—</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    `;
-
-    // события
-    $("#in-views").addEventListener("input", e => { views = +e.target.value; render(); });
-    $("#in-cv").addEventListener("input", e => { cvRate = +e.target.value; $("#hint-cv").textContent=cvRate; render(); });
-    $("#in-int").addEventListener("input", e => { intRate = +e.target.value; $("#hint-int").textContent=intRate; render(); });
-    $("#in-pr").addEventListener("input", e => { prRate = +e.target.value; $("#hint-pr").textContent=prRate; render(); });
-    $("#in-hire").addEventListener("input", e => { hireRate = +e.target.value; $("#hint-hire").textContent=hireRate; render(); });
-    $("#in-ad").addEventListener("input", e => { adSpend = +e.target.value; render(); });
-    $("#reset").addEventListener("click", () => { views=5333; cvRate=3; intRate=25; prRate=10; hireRate=50; adSpend=500;
+    // inputs
+    $("#in-views").addEventListener("input", e => { views=+e.target.value; render(); });
+    $("#in-cv").addEventListener("input",    e => { cvRate=+e.target.value;  $("#hint-cv").textContent=cvRate;   render(); });
+    $("#in-int").addEventListener("input",   e => { intRate=+e.target.value; $("#hint-int").textContent=intRate; render(); });
+    $("#in-pr").addEventListener("input",    e => { prRate=+e.target.value;  $("#hint-pr").textContent=prRate;   render(); });
+    $("#in-hire").addEventListener("input",  e => { hireRate=+e.target.value;$("#hint-hire").textContent=hireRate; render(); });
+    $("#in-ad").addEventListener("input",    e => { adSpend=+e.target.value; render(); });
+    $("#reset").addEventListener("click", () => {
+      views=5333; cvRate=3; intRate=25; prRate=10; hireRate=50; adSpend=500;
       $("#in-views").value=views; $("#in-cv").value=cvRate; $("#in-int").value=intRate; $("#in-pr").value=prRate; $("#in-hire").value=hireRate; $("#in-ad").value=adSpend;
       $("#hint-cv").textContent=cvRate; $("#hint-int").textContent=intRate; $("#hint-pr").textContent=prRate; $("#hint-hire").textContent=hireRate;
       render();
